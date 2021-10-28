@@ -14,8 +14,15 @@ describe("Secure cookie (same page)", () => {
  * the one we're viewing
  */
 describe("Secure cookie (different page)", () => {
-  it("Displays the cookie after it's been set", () => {
-    cy.visit("http://localhost:3000/set-cookie");
+  it("Displays an insecure cookie after it's been set", () => {
+    cy.visit("http://localhost:3000/set-cookie?secure=false");
+    cy.visit("http://localhost:3000/");
+    cy.get("[data-cy=cookie]")
+      .should("include.text", "Cookie value:")
+      .should("not.include.text", "undefined");
+  });
+  it("Displays a secure cookie after it's been set", () => {
+    cy.visit("http://localhost:3000/set-cookie?secure=true");
     cy.visit("http://localhost:3000/");
     cy.get("[data-cy=cookie]")
       .should("include.text", "Cookie value:")

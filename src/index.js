@@ -5,9 +5,13 @@ fastify.register(require("fastify-cookie"), {});
 
 const cookieName = "mySecureCookie";
 
+/**
+ * Demonstrates that Cypress will set the cookie, but won't actually send it, if
+ * we're viewing a different page than the one the cookie was set on
+ */
 fastify.get("/set-cookie", async (request, reply) => {
   reply.setCookie(cookieName, new Date().toString(), {
-    secure: true,
+    secure: request.query.secure === "true",
     sameSite: "lax",
   });
   reply.type("text/html");
@@ -20,6 +24,10 @@ fastify.get("/", async (request, reply) => {
   reply.send(`<p data-cy="cookie">Cookie value: ${cookieValue}</p>`);
 });
 
+/**
+ * Demonstrates that Cypress will send the cookie if it's set on the same page
+ * we're showing
+ */
 fastify.get("/set-and-show", async (request, reply) => {
   reply.type("text/html");
   const cookieValue = request.cookies[cookieName];
