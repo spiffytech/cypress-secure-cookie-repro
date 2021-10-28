@@ -3,22 +3,37 @@ const fastify = require("fastify")({ logger: true });
 
 fastify.register(require("fastify-cookie"), {});
 
-// Declare a route
-fastify.get("/", async (request, reply) => {
-  const cookieValue = request.cookies.mySecureCookie;
+const cookieName = "mySecureCookie";
+
+fastify.get("/set-cookie", async (request, reply) => {
+  reply.setCookie(cookieName, new Date().toString(), {
+    secure: true,
+    sameSite: "lax",
+  });
   reply.type("text/html");
+  return "<p>Cookie has been set</p>";
+});
+
+fastify.get("/", async (request, reply) => {
+  const cookieValue = request.cookies[cookieName];
+  reply.type("text/html");
+  reply.send(`<p data-cy="cookie">Cookie value: ${cookieValue}</p>`);
+});
+
+fastify.get("/set-and-show", async (request, reply) => {
+  reply.type("text/html");
+  const cookieValue = request.cookies[cookieName];
   if (!cookieValue) {
-    reply.setCookie("mySecureCookie", new Date().toString(), {
+    reply.setCookie(cookieName, new Date().toString(), {
       secure: true,
       sameSite: "lax",
     });
-    reply.send(`<p data-cy="no-cookie">Request didn't have a cookie</p>`);
+    return '<p data-cy="no-cookie">Cookie has been set</p>';
   } else {
     reply.send(`<p data-cy="cookie">Cookie value: ${cookieValue}</p>`);
   }
 });
 
-// Run the server!
 const start = async () => {
   try {
     await fastify.listen(3000);
