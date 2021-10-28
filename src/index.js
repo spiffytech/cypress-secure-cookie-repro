@@ -10,7 +10,7 @@ const cookieName = "mySecureCookie";
  * we're viewing a different page than the one the cookie was set on
  */
 fastify.get("/set-cookie", async (request, reply) => {
-  reply.setCookie(cookieName, new Date().toString(), {
+  reply.setCookie(cookieName, new Date().toISOString(), {
     secure: request.query.secure === "true",
     sameSite: "lax",
   });
@@ -32,7 +32,7 @@ fastify.get("/set-and-show", async (request, reply) => {
   reply.type("text/html");
   const cookieValue = request.cookies[cookieName];
   if (!cookieValue) {
-    reply.setCookie(cookieName, new Date().toString(), {
+    reply.setCookie(cookieName, new Date().toISOString(), {
       secure: true,
       sameSite: "lax",
     });
